@@ -8,15 +8,23 @@ header {
     text-align: center;
 }
 
-h1{
+h1 {
     font-size: 40px;
+}
+
+h4 {
+    font-size: 17px;
+}
+
+#message {
+    line-height: 1.5em;
 }
 
 .board-container {
     display: flex;
     flex-flow: row wrap;
-    justify-content: space-evenly;
-    align-items: flex-start;
+    justify-content: space-between;
+    align-content: space-between;
     margin: 30px auto 5px; 
     height: 400px;
     width: 400px;
@@ -39,7 +47,7 @@ h1{
 .win-totals {
     display: flex;
     justify-content: space-between;
-    width: 380px;
+    width: 390px;
     margin: 5px auto;
 }
 

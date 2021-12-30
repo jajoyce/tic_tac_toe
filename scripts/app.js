@@ -2,12 +2,15 @@ const squares = document.querySelectorAll('.square');
 const restart = document.querySelector('.restart');
 const message = document.getElementById('message');
 const playerXWinTotal = document.getElementById('x-wins');
-const playerOWinTotal = document.getElementById('o-wins');
+const computerOWinTotal = document.getElementById('o-wins');
 
 let turn = 1;
 let gameOver = false;
 let playerXWinNum = 0;
-let playerOWinNum = 0;
+let computerOWinNum = 0;
+let time = 5;
+let turnInterval;
+let computerDelay;
 
 const winCombos = [
     [0, 1, 2], 
@@ -29,18 +32,23 @@ restart.addEventListener('click', resetBoard);
 function clickSquare(event) {
     if (!gameOver) {
         if (event.target.innerText) {
-            message.innerText = 'Choose an empty square!';
+            message.innerHTML = `Choose an empty square! <br> You have ${time} seconds to choose...`;
+            event.target.style.backgroundColor = '#99a';
+            setTimeout(() => event.target.style.backgroundColor = '', 500);
         } else if (turn % 2 === 0) {
             event.target.innerText = 'O';
+            clearTimeout(computerDelay);
             if (!checkWin('O')) {
                 turn++;
-                message.innerText = 'Player X, your turn!';
+                turnInterval = setInterval(turnTimer, 1000);
             }
         } else {
             event.target.innerText = 'X';
+            resetTimer();
             if (!checkWin('X')) {
                 turn++;
-                message.innerText = 'Player O, your turn!';
+                message.innerHTML = 'Computer O is up! <br> Choosing a square...';
+                computerDelay = setTimeout(randomSquareClick, 2000);
             }
         }
     }
@@ -54,7 +62,8 @@ function resetBoard() {
     }
     turn = 1;
     gameOver = false;
-    message.innerText = 'Player X goes first, Player O second.'
+    resetTimer();
+    message.innerHTML = 'Player X goes first. <br> Computer O goes second.';
 }
 
 function checkWin(player) {
@@ -63,37 +72,62 @@ function checkWin(player) {
             if (squares[winCombos[i][0]].innerText === player && 
                 squares[winCombos[i][1]].innerText === player && 
                 squares[winCombos[i][2]].innerText === player) {
-                    playerWins(player, winCombos[i])
+                    playerWins(player, winCombos[i]);
                     return true;
                 }
         }
         if (turn === 9) {
-            draw()
+            draw();
             return true;
         }
     } return false;
 }
 
 function playerWins(player, winCombo) {
-    message.innerText = `Game over, Player ${player} wins!`
     gameOver = true;
     winCombo.forEach(function(i) {
         squares[i].style.backgroundColor = '#125';
         squares[i].style.color = '#cce';
     })
     if (player === 'X') {
+        message.innerHTML = 'Game over! <br> Player X wins!';
         playerXWinNum++;
         playerXWinTotal.innerText = playerXWinNum;
     } else {
-        playerOWinNum++;
-        playerOWinTotal.innerText = playerOWinNum;
+        message.innerHTML = 'Game over! <br> Computer O wins!';
+        computerOWinNum++;
+        computerOWinTotal.innerText = computerOWinNum;
     }
 }
 
-function draw () {
-    message.innerText = "It's a draw! Start Over!"
+function draw() {
+    message.innerHTML = "It's a draw! <br> Start Over!";
     gameOver = true;
     squares.forEach((square) => {
-        square.style.backgroundColor = '#99a'
-    })
+        square.style.backgroundColor = '#99a';
+    });
+}
+
+function randomSquareClick() {
+    let openSquares = []
+    for (let i = 0; i < squares.length; i++) {
+        if (!squares[i].innerText) {
+            openSquares.push(squares[i]);
+        }
+    }
+    let randomChoice = openSquares[Math.floor(Math.random() * openSquares.length)];
+    randomChoice.click();
+}
+
+function turnTimer() {
+    message.innerHTML = `Player X, your turn! <br> You have ${time} seconds to choose...`;
+    time--;
+    if (time < 0) {
+        randomSquareClick();
+    }
+}
+
+function resetTimer() {
+    clearInterval(turnInterval);
+    setTimeout(() => time = 5, 10);
 }
